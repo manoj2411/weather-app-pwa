@@ -1,3 +1,6 @@
+//= require localforage-1.4.0.js
+
+
 (function() {
   'use strict';
 
@@ -69,8 +72,27 @@
     var key = selected.value;
     var label = selected.textContent;
     app.getForecast(key, label);
+    app.selectedCities.push({key: key, label: label});
+    app.saveSelectedCities();
     app.toggleDialog(false);
 
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    window.localforage.getItem('selectedCities', function (err, cityList) {
+      if(cityList) {
+        app.selectedCities = cityList;
+        app.selectedCities.forEach(function(city) {
+          app.getForecast(city.key, city.label);
+        })
+      }
+      else {
+        // When no city selected then load default city with default data
+        app.updateForecastCard(injectedForecast);
+        app.selectedCities.push({key: injectedForecast.key, label: injectedForecast.label});
+        app.saveSelectedCities();
+      }
+    })
   })
 
 
@@ -174,6 +196,9 @@
       app.getForecast(key);
     })
   }
-  app.updateForecastCard(injectedForecast);
+
+  app.saveSelectedCities = function () {
+    window.localforage.setItem('selectedCities', app.selectedCities);
+  }
 
 })();
