@@ -12,6 +12,7 @@
         isLoading: true,
         visibleCards: {},
         selectedCities: [],
+        isRequestPending: true,
         spinner: document.querySelector('.loader'),
         cardTemplate: document.querySelector('.cardTemplate'),
         container: document.querySelector('.main'),
@@ -173,18 +174,36 @@
   app.getForecast = function(key, label) {
     app.startLoader();
     var url = weatherAPIUrlBase + key + '.json'
+
+    // checks if cache is available in browser
+    if('caches' in window) {
+      caches.match(url).then(function(response) {
+        if(response) {
+          response.json().then(function(json) {
+            // only update if network request is still pending
+            if(app.isRequestPending) {
+              console.log('Updating card from cache!!!');
+              json.key = key;
+              json.label = label;
+              app.updateForecastCard(json);
+            }
+          })
+        }
+      });
+    }
+
+    app.isRequestPending = true;
     // Make the XHR to get the data, then update the card
     var request = new XMLHttpRequest();
-
     request.onreadystatechange = function() {
       if(request.readyState == XMLHttpRequest.DONE && request.status === 200) {
         var response = JSON.parse(request.response);
         response.key = key;
         response.label = label;
+        app.isRequestPending = false;
         app.updateForecastCard(response);
       }
     }
-
     request.open('GET', url);
     request.send();
   }

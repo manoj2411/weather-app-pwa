@@ -1,5 +1,7 @@
 // Caching the App Shell
 var cacheName = 'weatherPWA-v1'; // This needs to be changes whenever any appshell resources are changed to clean the cache.
+var dataCacheName = 'weatherPWA-data';
+var dataURL = 'https://publicdata-weather.firebaseio.com'
 var filesToCache = [
   '/pwa',
   '/assets/pwa/ud811.css?body=1',
@@ -17,7 +19,7 @@ var filesToCache = [
 
 self.addEventListener('install', function(e) {
   // perfect place to cache all the resource that are required for app shell (html, css, any javascript)
-  // console.log('Install event..');
+  console.log('***Install event***');
   e.waitUntil(
     // open: returns a Promise that resolves to the Cache object matching the cacheName
     caches.open(cacheName).then(function(cache) {
@@ -31,6 +33,7 @@ self.addEventListener('install', function(e) {
 
 
 self.addEventListener('activate', function(e) {
+  console.log('***Activate event***');
   e.waitUntil(
     // keys() method of the Cache interface returns a Promise that resolves to an array of Cache keys
     caches.keys().then(function(keyList) {
@@ -68,23 +71,38 @@ self.addEventListener('activate', function(e) {
 
 self.addEventListener('fetch', function(e) {
   // console.log('[SW] Fetch', e.request.url);
-  e.respondWith(
-    // match() method of the CacheStorage interface checks if a given Request is a key in any of the Cache objects
-    // that the CacheStorage object tracks and returns a Promise that resolves to the matching Response.
-    caches.match(e.request).then(function(response) {
-      // fetch: https://developers.google.com/web/updates/2015/03/introduction-to-fetch
-      // fetch() allows you to make network requests similar to XMLHttpRequest (XHR).
-      // The main difference is that the Fetch API uses Promises, which enables a simpler and cleaner API,
-      // avoiding callback hell and having to remember the complex API of XMLHttpRequest
-      if(response) {
-        console.log('Serving from cache: ', e.request.url);
-      }
-      else {
-        console.log('Fetching from web: ', e.request.url);
-      }
-      return response || fetch(e.request);
-    })
-  )
+
+  if(e.request.url.startsWith(dataURL)) {
+    e.respondWith(
+      fetch(e.request).then(function(response) {
+        return caches.open(dataCacheName).then(function(cache) {
+          cache.put(e.request.url, response.clone());
+          console.log('[SW] Fetched & Cached for: ', e.request.url);
+          return response;
+        })
+      })
+    );
+  }
+  else {
+    e.respondWith(
+      // match() method of the CacheStorage interface checks if a given Request is a key in any of the Cache objects
+      // that the CacheStorage object tracks and returns a Promise that resolves to the matching Response.
+      caches.match(e.request).then(function(response) {
+        // fetch: https://developers.google.com/web/updates/2015/03/introduction-to-fetch
+        // fetch() allows you to make network requests similar to XMLHttpRequest (XHR).
+        // The main difference is that the Fetch API uses Promises, which enables a simpler and cleaner API,
+        // avoiding callback hell and having to remember the complex API of XMLHttpRequest
+        if(response) {
+          console.log('Serving from cache: ', e.request.url);
+        }
+        else {
+          console.log('Fetching from web: ', e.request.url);
+        }
+        return response || fetch(e.request);
+      })
+    );
+  }
+
 });
 
 
