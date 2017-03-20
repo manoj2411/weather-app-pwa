@@ -64,3 +64,13 @@ MyApp::Application.routes.draw do
   # Note: This route will make all actions in every controller accessible via GET requests.
   # match ':controller(/:action(/:id))(.:format)'
 end
+
+
+# Caching stratergies
+# ----------------------
+# 1. Cache first then network. Can be used to store key components of the app shell. Not good for things where data change frequently.
+# 2. Network first then cache: Ideal for api related data, but can give bad UX when network is slow.
+# 3. cache only
+# 4. network only
+# 5. Cache and network race: It'll fetch from network and also from from cache, and use whatever is faster.
+# 6. Cache then network : Fetch from both cache and network, first show from cache and then update cache and page both once network request completed.

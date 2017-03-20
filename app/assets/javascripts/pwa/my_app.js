@@ -223,11 +223,11 @@
   //  =====================
   //  = SW related things =
   //  =====================
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/service-worker.js').
-      then(function(registration) {
-        console.log('Service Worker obj: ', registration);
-      });
-  }
+  // if('serviceWorker' in navigator){
+  //   navigator.serviceWorker.register('/service-worker.js').
+  //     then(function(registration) {
+  //       console.log('Service Worker obj: ', registration);
+  //     });
+  // }
 
 })();
