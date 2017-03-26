@@ -1,0 +1,35 @@
+module.exports = {
+  dontCacheBustUrlsMatching: /assets/,
+  navigateFallback: '/418',
+  navigateFallbackWhitelist: [],
+  staticFileGlobs: ["**/assets/**.css", "**/assets/**.js"], //"app/assets/images/pwa/**.png"
+    // '/assets/**.css',
+    // '/assets/**.json',
+    // '/assets/**.JPG',
+    // '/assets/**.png',
+    // '/pwa?offline=true',
+    // '/pwa',
+  // ],
+  runtimeCaching: [
+    {
+      urlPattern: /^https:\/\/publicdata-weather\.firebaseio\.com/,
+      handler: 'networkFirst'
+    },
+    {
+      urlPattern: /\?offline=true/,
+      handler: 'networkFirst'
+    }
+  ],
+  stripPrefixMulti: {
+    "app": "",
+    "public": ""
+  },
+  // dynamicUrlToDependencies: {
+  //   '/page1': [
+  //     'app/views/layout.jade',
+  //     'app/views/page1.jade'
+  //   ],
+  swFilePath: 'app/assets/javascripts/service-worker.js'
+};
+
+//  sw-precache --config=app/assets/javascripts/sw-precache-config.js.erb

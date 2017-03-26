@@ -1,1 +1,1 @@
-Rails.configuration.assets.precompile += %w[serviceworker.js manifest.json]
+Rails.configuration.assets.precompile += %w[service-worker.js manifest.json]

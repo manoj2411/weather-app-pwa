@@ -3,6 +3,7 @@ MyApp::Application.configure do
   config.serviceworker.routes.draw do
     # map to assets implicitly
     match "/serviceworker.js"
+    match "/service-worker.js"
     match "/manifest.json"
 
     # Examples
